@@ -1,72 +1,36 @@
+var express = require('express');
+var bodyParser = require('body-parser');
 
 
-// save new something
-var Todo = mongoose.model('Todo', { // model du document, à mettre au singulier car mongoose mettra le nom de la collec au pluriel
+//var mongoose = require('./db/mongoose').mongoose; 
+var {mongoose} = require('./db/mongoose'); 
+var {Todo} = require('./models/todo');
+var {User} = require('./models/user');
 
-    text: {
-        type: String,
-        required: true,
-        minlength: 1,
-        trim: true //remove white space before and after 
+var app = express();
 
-    },
-    completed: {
-        type: Boolean,
-        default: false
+app.use(bodyParser.json());
 
-    },
-    completedAt: {
-        type: Number,
-        default: null
-    }
-});
+//CRUD = create, read, update, delete
+app.post('/todos', (req, res) => {
+    //console.log(req.body);
 
-var User = mongoose.model('User', {
-    email: {
-        type: String,
-        minlength: 1,
-        required: true,
-        trim: true
-    }
+    var todo = new Todo({
+        text: req.body.text
+    });
 
-});
+    todo.save().then((doc) => {
+        res.send(doc);
 
-// var newTodo = new Todo({
-//     text: 'Cook dinner'
-// });
+    }, (err) => {
+        res.status(400).send(err);
 
-// newTodo.save().then((doc) => {
-//     console.log('Saved to do', doc);
+    });
 
-// }, (err) => {
-//     console.log('Unable to save todo : ', err);
-
-// });
-
-
-var otherTodo = new Todo({
-    text: '    Edit this video    ' // ok because trim, mongoose utilise le cast, taper 123 convertira en '123'
 
 });
 
-otherTodo.save().then((doc) => {
-    console.log(JSON.stringify(doc, undefined, 2));
-
-}, (err) => {
-    console.log('Unable to save todo : ', err);
-
-});
-
-
-var user = new User({
-    email: 'daivy.merlijs@hotmail.com      '
-
-})
-
-user.save().then((doc) => {
-    console.log(JSON.stringify(doc, undefined, 2));
-
-}, (err) => {
-    console.log('Unable to save user : ', err);
+app.listen(3000, () => {
+    console.log('Started on port 3000');
 
 });
